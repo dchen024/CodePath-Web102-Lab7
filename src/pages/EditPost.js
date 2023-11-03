@@ -4,8 +4,16 @@ import "./EditPost.css";
 import { supabase } from "../client";
 
 const EditPost = () => {
-  const [post, setPost] = useState({});
   const { id } = useParams();
+  const [post, setPost] = useState({});
+
+  async function deletePost(event) {
+    event.preventDefault();
+
+    await supabase.from("Posts").delete().eq("id", id);
+
+    window.location = "/";
+  }
 
   useEffect(() => {
     async function fetchPost() {
@@ -15,13 +23,12 @@ const EditPost = () => {
         .eq("id", id)
         .single();
 
-      console.log(data);
-
       // set state of posts
       setPost(data);
     }
+
     fetchPost();
-  }, []);
+  }, [id]);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -84,7 +91,9 @@ const EditPost = () => {
         ></textarea>
         <br />
         <input type="submit" value="Submit" />
-        <button className="deleteButton">Delete</button>
+        <button className="deleteButton" onClick={deletePost}>
+          Delete
+        </button>
       </form>
     </div>
   );
