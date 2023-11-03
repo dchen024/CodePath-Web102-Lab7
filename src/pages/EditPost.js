@@ -1,32 +1,93 @@
-import React from 'react';
-import { useParams } from 'react-router-dom';
-import './EditPost.css'
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import "./EditPost.css";
+import { supabase } from "../client";
 
-const EditPost = ({data}) => {
+const EditPost = () => {
+  const [post, setPost] = useState({});
+  const { id } = useParams();
 
-    const {id} = useParams();
-    const post = data.filter(item => item.id === id)[0];
+  useEffect(() => {
+    async function fetchPost() {
+      const { data } = await supabase
+        .from("Posts")
+        .select()
+        .eq("id", id)
+        .single();
 
-    return (
-        <div>
-            <form>
-                <label for="title">Title</label> <br />
-                <input type="text" id="title" name="title" value={post.title} /><br />
-                <br/>
+      console.log(data);
 
-                <label for="author">Author</label><br />
-                <input type="text" id="author" name="author" value={post.author} /><br />
-                <br/>
+      // set state of posts
+      setPost(data);
+    }
+    fetchPost();
+  }, []);
 
-                <label for="description">Description</label><br />
-                <textarea rows="5" cols="50" id="description" value={post.description} >
-                </textarea>
-                <br/>
-                <input type="submit" value="Submit" />
-                <button className="deleteButton">Delete</button>
-            </form>
-        </div>
-    )
-}
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+    setPost((prev) => {
+      return {
+        ...prev,
+        [name]: value,
+      };
+    });
+  };
 
-export default EditPost
+  const updatePost = async (event) => {
+    event.preventDefault();
+
+    await supabase
+      .from("Posts")
+      .update({
+        title: post.title,
+        author: post.author,
+        description: post.description,
+      })
+      .eq("id", id);
+
+    window.location = "/";
+  };
+
+  return (
+    <div>
+      <form onSubmit={updatePost}>
+        <label for="title">Title</label> <br />
+        <input
+          type="text"
+          id="title"
+          name="title"
+          value={post.title}
+          onChange={handleChange}
+        />
+        <br />
+        <br />
+        <label for="author">Author</label>
+        <br />
+        <input
+          type="text"
+          id="author"
+          name="author"
+          value={post.author}
+          onChange={handleChange}
+        />
+        <br />
+        <br />
+        <label for="description">Description</label>
+        <br />
+        <textarea
+          rows="5"
+          cols="50"
+          id="description"
+          name="description"
+          value={post.description}
+          onChange={handleChange}
+        ></textarea>
+        <br />
+        <input type="submit" value="Submit" />
+        <button className="deleteButton">Delete</button>
+      </form>
+    </div>
+  );
+};
+
+export default EditPost;
