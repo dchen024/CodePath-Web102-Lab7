@@ -1,27 +1,78 @@
-import React from 'react';
-import './CreatePost.css'
+import React, { useState } from "react";
+import "./CreatePost.css";
+import { supabase } from "../client";
 
 const CreatePost = () => {
+  const [post, setPost] = useState({ title: "", author: "", description: "" });
 
-    return (
-        <div>
-            <form>
-                <label for="title">Title</label> <br />
-                <input type="text" id="title" name="title" /><br />
-                <br/>
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+    setPost((prev) => {
+      return {
+        ...prev,
+        [name]: value,
+      };
+    });
+  };
 
-                <label for="author">Author</label><br />
-                <input type="text" id="author" name="author" /><br />
-                <br/>
+  const createPost = async (event) => {
+    event.preventDefault();
 
-                <label for="description">Description</label><br />
-                <textarea rows="5" cols="50" id="description">
-                </textarea>
-                <br/>
-                <input type="submit" value="Submit" />
-            </form>
-        </div>
-    )
-}
+    const { error } = await supabase
+      .from("Posts")
+      .insert({
+        title: post.title,
+        author: post.author,
+        description: post.description,
+      })
+      .select();
 
-export default CreatePost
+    if (error) {
+      console.log(error);
+    }
+
+    window.location = "/";
+  };
+
+  return (
+    <div>
+      <form>
+        <label>Title</label> <br />
+        <input
+          type="text"
+          id="title"
+          name="title"
+          value={post.title}
+          onChange={handleChange}
+        />
+        <br />
+        <br />
+        <label>Author</label>
+        <br />
+        <input
+          type="text"
+          id="author"
+          name="author"
+          value={post.author}
+          onChange={handleChange}
+        />
+        <br />
+        <br />
+        <label>Description</label>
+        <br />
+        <textarea
+          name="description"
+          rows="5"
+          cols="50"
+          id="description"
+          value={post.description}
+          onChange={handleChange}
+        ></textarea>
+        <br />
+        <input type="submit" value="Submit" onClick={createPost} />
+      </form>
+    </div>
+  );
+};
+
+export default CreatePost;
