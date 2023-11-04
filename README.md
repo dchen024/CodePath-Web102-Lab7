@@ -1,4 +1,8 @@
-# ENV Keys
+# Made using Create React App
+- npm i
+- npm start
 
-SUPABASE_PROJECT_URL  
-SUPABASE_API_KEY
+# ENV
+
+REACT_APP_SUPABASE_PROJECT_URL  
+REACT_APP_SUPABASE_API_KEY
