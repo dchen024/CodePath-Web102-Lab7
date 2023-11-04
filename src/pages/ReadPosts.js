@@ -29,6 +29,7 @@ const ReadPosts = () => {
             title={post.title}
             author={post.author}
             description={post.description}
+            betCount={post.betCount}
           />
         ))
       ) : (
